@@ -40,6 +40,9 @@ const cli = meow(
         --ratio         Simplifier ratio (default: 0)
         --error         Simplifier error threshold (default: 0.0001)
     --debug, -D         Debug output
+    --script            Path to a script to run during processing 
+                        • onBeforeParse ({gltf:GLTF, file:string})  : Promise<void>
+                        • onAfterParse  ({gltf:GLTF, result:string}): Promise<void>
 `,
   {
     importMeta: import.meta,
@@ -70,6 +73,7 @@ const cli = meow(
       ratio: { type: 'number', default: 0.75 },
       error: { type: 'number', default: 0.001 },
       debug: { type: 'boolean', shortFlag: 'D' },
+      script: { type: 'string' },
     },
   }
 )

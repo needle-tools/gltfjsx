@@ -53,7 +53,14 @@ export default function (file, output, options) {
         if (output && path.parse(output).ext === '.tsx') {
           options.types = true
         }
-        
+
+        // Load script
+        if (options.script) {
+          let scriptPath = path.resolve(process.cwd(), options.script);
+          scriptPath = `file:${scriptPath}`
+          options.script = await import(scriptPath);
+        }
+
         if (options.transform || options.instance || options.instanceall) {
           const { name } = path.parse(file)
           const outputDir = path.parse(path.resolve(output ?? file)).dir;
@@ -74,8 +81,12 @@ export default function (file, output, options) {
         gltfLoader.parse(
           arrayBuffer,
           '',
-          async (gltf) => {        
-            stream.write(await parse(gltf, { fileName: filePath, size, ...options }))
+          async (gltf) => {
+            await options.script?.onBeforeParse?.({ file, gltf });
+            let result = await parse(gltf, { fileName: filePath, size, ...options });
+            const args = { gltf, result };
+            await options.script?.onAfterParse?.(args);
+            stream.write(args.result)
             stream.end()
             resolve()
           },
