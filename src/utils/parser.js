@@ -3,6 +3,9 @@ import * as prettier from 'prettier'
 import babelParser from 'prettier/parser-babel.js'
 import isVarName from './isVarName.js'
 
+/**
+ * @param {THREE.Object3D | { scene: THREE.Object3D, animations: THREE.AnimationClip[], parser: { json: any } }} gltf
+ */
 function parse(gltf, { fileName = 'model', ...options } = {}) {
   if (gltf.isObject3D) {
     // Wrap scene in a GLTF Structure
@@ -14,10 +17,14 @@ function parse(gltf, { fileName = 'model', ...options } = {}) {
   const hasAnimations = animations.length > 0
 
   // Collect all objects
+  /** @type {Objet3D[]} */
   const objects = []
   gltf.scene.traverse((child) => objects.push(child))
 
   // Browse for duplicates
+  /**
+   * @type {{names: Record<string, number>, materials: Record<string, number>, geometries: Record<string, { count: number, name: string, node: string }>}
+   */
   const duplicates = {
     names: {},
     materials: {},
@@ -69,6 +76,7 @@ function parse(gltf, { fileName = 'model', ...options } = {}) {
     }
   }
 
+  /** @type {boolean} */
   const hasInstances = (options.instance || options.instanceall) && Object.keys(duplicates.geometries).length > 0
 
   function sanitizeName(name) {
@@ -396,6 +404,10 @@ function parse(gltf, { fileName = 'model', ...options } = {}) {
     } else return ''
   }
 
+  /**
+   * @param {Object3D} obj
+   * @param {number} line
+   */
   function p(obj, line) {
     console.log(
       [...new Array(line * 2)].map(() => ' ').join(''),
