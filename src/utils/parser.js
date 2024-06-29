@@ -511,7 +511,10 @@ useGLTF.preload('${url}')`
     jsxBracketSameLine: true,
     parser: 'babel-ts',
     plugins: [babelParser],
-  })
+  }).catch((e) => {
+    console.error('Error formatting gltfjsx output', e);
+    return output
+  });
 }
 
 export default parse
